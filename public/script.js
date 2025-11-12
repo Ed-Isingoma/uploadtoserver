@@ -93,10 +93,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             
             const files = await response.json();
-            console.log('Loaded files:', files); // Debug log
 
             if (files.length === 0) {
-                fileList.innerHTML = '<p>No files uploaded yet.</p>';
+                fileList.innerHTML = '<p style="text-align: center; color: #666; padding: 20px 0;">No files uploaded yet.</p>';
                 return;
             }
 
@@ -138,7 +137,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }).join('');
         } catch (error) {
             console.error('Error loading files:', error);
-            fileList.innerHTML = `<p>Error loading files: ${error.message}</p>`;
+            fileList.innerHTML = `<p style="text-align: center; color: #d32f2f; padding: 20px 0;">Error loading files: ${error.message}</p>`;
         }
     }
 });

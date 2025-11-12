@@ -2,29 +2,16 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ColleagueLocal</title>
-  <style>
-    body { font-family: Arial, sans-serif; margin: 2em; background-color: #f4f4f4; }
-    .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-    h1, h2 { color: #333; }
-    #file-list { padding: 0; }
-    .file-item { background: #eee; margin-bottom: 5px; padding: 10px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; }
-    .file-info { flex-grow: 1; }
-    .file-name { font-weight: bold; margin-bottom: 4px; }
-    .file-date { font-size: 0.85em; color: #666; }
-    .file-item a { text-decoration: none; color: #007bff; white-space: nowrap; padding: 5px 10px; }
-    .file-item a:hover { text-decoration: underline; }
-    form { margin-top: 20px; }
-    input[type="file"] { border: 1px solid #ccc; padding: 10px; border-radius: 4px; }
-    button { background-color: #28a745; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; }
-    button:hover { background-color: #218838; }
-    #progressContainer { margin-top: 10px; }
-    #progress-bar { width: 100%; height: 20px; }
-    #successMessage { margin-top: 10px; padding: 10px; border-radius: 4px; background: #d4edda; color: #155724; font-weight: bold; display: none; }
-  </style>
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="container">
+    <div class="page-title">ColleagueLocal</div>
+    
     <h1>Upload a File</h1>
     <form id="uploadForm">
       <input type="file" name="file" id="fileInput" required>
@@ -39,7 +26,9 @@
     <div id="successMessage"></div>
 
     <h2>Available Files</h2>
-    <div id="fileList"></div>
+    <div class="file-list-container">
+      <div id="fileList"></div>
+    </div>
   </div>
 
   <script src="/script.js"></script>
