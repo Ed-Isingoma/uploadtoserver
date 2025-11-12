@@ -110,6 +110,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             fileList.innerHTML = sortedFiles.map(file => {
                 let date;
+                let displayName;
+                
                 if (file.uploadDate !== 'Unknown') {
                     const d = new Date(file.uploadDate);
                     const day = String(d.getDate()).padStart(2, '0');
@@ -118,14 +120,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     const hours = String(d.getHours()).padStart(2, '0');
                     const minutes = String(d.getMinutes()).padStart(2, '0');
                     date = `${day}/${month}/${year} ${hours}:${minutes}`;
+                    displayName = file.originalName;
                 } else {
                     date = 'Unknown';
+                    displayName = file.filename;
                 }
                 
                 return `
                     <div class="file-item">
                         <div class="file-info">
-                            <div class="file-name">${file.originalName}</div>
+                            <div class="file-name">${displayName}</div>
                             <div class="file-date">${date}</div>
                         </div>
                         <a href="/download/${file.filename}" download>Download</a>

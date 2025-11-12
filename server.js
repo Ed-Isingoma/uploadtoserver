@@ -2,7 +2,7 @@ const express = require('express');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
-const bonjour = require('bonjour')();
+const os = require('os');
 const app = express();
 const PORT = 3000;
 
@@ -38,29 +38,39 @@ app.get('/files', (req, res) => {
     // Return all files with parsed info
     const fileList = files
       .filter(filename => {
-        // Filter out any system files or non-uploaded files
-        return !filename.startsWith('.') && filename.includes('-');
+        // Only filter out hidden files
+        return !filename.startsWith('.');
       })
       .map(filename => {
         try {
+          // Check if filename has timestamp format (number-filename)
           const dashIndex = filename.indexOf('-');
-          const timestamp = filename.substring(0, dashIndex);
-          const originalName = filename.substring(dashIndex + 1);
           
-          // Validate timestamp is a number
-          const timestampNum = parseInt(timestamp);
-          const uploadDate = !isNaN(timestampNum) && timestampNum > 0 
-            ? new Date(timestampNum).toISOString() 
-            : 'Unknown';
+          if (dashIndex > 0) {
+            const timestamp = filename.substring(0, dashIndex);
+            const originalName = filename.substring(dashIndex + 1);
+            
+            // Validate timestamp is a number
+            const timestampNum = parseInt(timestamp);
+            
+            if (!isNaN(timestampNum) && timestampNum > 0) {
+              return {
+                filename: filename,
+                originalName: originalName,
+                uploadDate: new Date(timestampNum).toISOString()
+              };
+            }
+          }
           
+          // If no valid timestamp format, return filename as-is
           return {
             filename: filename,
-            originalName: originalName,
-            uploadDate: uploadDate
+            originalName: filename,
+            uploadDate: 'Unknown'
           };
+          
         } catch (err) {
           console.error('Error parsing filename:', filename, err);
-          // Return as-is if parsing fails
           return {
             filename: filename,
             originalName: filename,
@@ -98,8 +108,38 @@ app.get('/download/:filename', (req, res) => {
 });
 
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Server listening on http://localhost:${PORT}`);
-  // Advertise the service on the LAN
-  bonjour.publish({ name: 'isingoma', type: 'http', port: PORT });
+  console.log('\n' + '='.repeat(70));
+  console.log('🚀 ColleagueLocal Server is Running!');
+  console.log('='.repeat(70));
+  
+  // Get all network URLs
+  const interfaces = os.networkInterfaces();
+  const urls = [];
+  
+  Object.keys(interfaces).forEach(ifname => {
+    interfaces[ifname].forEach(iface => {
+      if (iface.family === 'IPv4' && !iface.internal) {
+        urls.push(`http://${iface.address}:${PORT}`);
+      }
+    });
+  });
+  
+  if (urls.length > 0) {
+    console.log('\n📱 SHARE THIS URL WITH OTHERS ON YOUR NETWORK:\n');
+    urls.forEach(url => {
+      console.log(`   ➜  ${url}`);
+    });
+    console.log('\n   👆 Copy one of these URLs and share it!\n');
+  } else {
+    console.log('\n⚠️  Warning: No network interfaces found!');
+    console.log('   Make sure you are connected to a network.\n');
+  }
+  
+  console.log('💻 Access from this computer:\n');
+  console.log(`   ➜  http://localhost:${PORT}`);
+  
+  console.log('\n' + '='.repeat(70));
+  console.log('Press Ctrl+C to stop the server');
+  console.log('='.repeat(70) + '\n');
 });
 
