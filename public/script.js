@@ -1,14 +1,28 @@
 document.addEventListener('DOMContentLoaded', () => {
     const uploadForm = document.getElementById('uploadForm');
     const fileInput = document.getElementById('fileInput');
+    const uploadButton = uploadForm.querySelector('button');
     const progressContainer = document.getElementById('progressContainer');
     const progressBar = document.getElementById('progressBar');
     const progressText = document.getElementById('progressText');
     const fileList = document.getElementById('fileList');
     const successMessage = document.getElementById('successMessage');
 
+    let lastFiles = []; // Store the last fetched files for comparison
+
+    // Initially disable the upload button
+    uploadButton.disabled = true;
+
+    // Enable/disable button based on file selection
+    fileInput.addEventListener('change', () => {
+        uploadButton.disabled = !fileInput.files[0];
+    });
+
     // Load files on page load
     loadFiles();
+
+    // Poll for updates every 2 seconds
+    setInterval(loadFiles, 2000);
 
     uploadForm.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -48,6 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     successMessage.textContent = '✓ File uploaded successfully!';
                     
                     fileInput.value = '';
+                    uploadButton.disabled = true; // Reset button state
                     
                     // Refresh file list after upload
                     loadFiles();
@@ -94,6 +109,13 @@ document.addEventListener('DOMContentLoaded', () => {
             
             const files = await response.json();
 
+            // Check if files have changed
+            const filesChanged = JSON.stringify(files) !== JSON.stringify(lastFiles);
+            if (!filesChanged) {
+                return; // No update needed
+            }
+            lastFiles = files; // Update stored files
+
             if (files.length === 0) {
                 fileList.innerHTML = '<p style="text-align: center; color: #666; padding: 20px 0;">No files uploaded yet.</p>';
                 return;
@@ -126,18 +148,75 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 
                 return `
-                    <div class="file-item">
+                    <div class="file-item" data-filename="${file.filename}" data-originalname="${file.originalName}">
                         <div class="file-info">
                             <div class="file-name">${displayName}</div>
                             <div class="file-date">${date}</div>
                         </div>
-                        <a href="/download/${file.filename}" download>Download</a>
                     </div>
                 `;
             }).join('');
+
+            // Add click event listeners to file items
+            document.querySelectorAll('.file-item').forEach(item => {
+                item.addEventListener('click', (e) => {
+                    // Prevent download link from triggering
+                    if (e.target.tagName === 'A') return;
+                    
+                    const filename = item.dataset.filename;
+                    const originalName = item.dataset.originalname;
+                    showPreview(filename, originalName);
+                });
+            });
         } catch (error) {
             console.error('Error loading files:', error);
             fileList.innerHTML = `<p style="text-align: center; color: #d32f2f; padding: 20px 0;">Error loading files: ${error.message}</p>`;
         }
+    }
+
+    function showPreview(filename, originalName) {
+        const isMobile = window.innerWidth <= 600;
+        const previewContainer = document.getElementById('previewContainer');
+        const previewContent = document.getElementById('previewContent');
+        const downloadButton = document.getElementById('downloadButton');
+        const backButton = document.getElementById('backButton');
+
+        // Check if file is an image (added .svg)
+        const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'];
+        const extension = filename.split('.').pop().toLowerCase();
+        const isImage = imageExtensions.includes(extension);
+
+        if (isImage) {
+            previewContent.innerHTML = `<img src="/download/${filename}" alt="${originalName}">`;
+        } else {
+            previewContent.innerHTML = `
+                <div class="preview-placeholder">
+                    <div class="file-icon">📄</div>
+                    <p>${originalName}</p>
+                    <p>Preview not available</p>
+                </div>
+            `;
+        }
+
+        downloadButton.onclick = () => {
+            const link = document.createElement('a');
+            link.href = `/download/${filename}`;
+            link.download = originalName;
+            link.click();
+        };
+
+        backButton.onclick = () => {
+            if (isMobile) {
+                previewContainer.classList.remove('preview-modal');
+                document.body.style.overflow = '';
+            }
+            previewContainer.style.display = 'none';
+        };
+
+        if (isMobile) {
+            previewContainer.classList.add('preview-modal');
+            document.body.style.overflow = 'hidden'; // Prevent background scrolling
+        }
+        previewContainer.style.display = 'flex';
     }
 });

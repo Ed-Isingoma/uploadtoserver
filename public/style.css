@@ -7,7 +7,7 @@ body {
   background-color: #f4f4f4; 
 }
 .container { 
-  max-width: 800px; 
+  max-width: 1200px; 
   margin: auto; 
   background: white; 
   padding: 20px; 
@@ -33,7 +33,13 @@ h2 {
   font-size: 1.3em;
   margin-top: 2em;
 }
+.content-wrapper {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}
 .file-list-container {
+  flex: 2;
   border: 1px solid #ddd;
   border-radius: 8px;
   padding: 10px;
@@ -129,6 +135,15 @@ button:hover {
 button:active {
   background-color: #1e7e34;
 }
+button:disabled {
+  background-color: #ccc;
+  color: #666;
+  cursor: not-allowed;
+}
+
+button:disabled:hover {
+  background-color: #ccc;
+}
 #progressContainer { 
   margin-top: 10px; 
 }
@@ -144,6 +159,64 @@ button:active {
   color: #155724; 
   font-weight: 500; 
   display: none; 
+}
+.preview-container {
+  flex: 3;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 10px;
+  background-color: #fafafa;
+  height: calc(100vh - 340px);
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+}
+.preview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.back-button, .download-button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+}
+.back-button {
+  background-color: #6c757d;
+  color: white;
+}
+.back-button:hover {
+  background-color: #5a6268;
+}
+.download-button {
+  background-color: #28a745;
+  color: white;
+}
+.download-button:hover {
+  background-color: #218838;
+}
+.preview-content {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.preview-content img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+.preview-placeholder {
+  text-align: center;
+  color: #666;
+}
+.preview-placeholder .file-icon {
+  font-size: 3em;
+  margin-bottom: 10px;
 }
 
 /* Mobile optimizations */
@@ -176,7 +249,7 @@ button:active {
     text-align: center;
     margin-top: 8px;
   }
-  .file-list-container {
+  .file-list-container, .preview-container {
     /* Mobile calculation:
        body padding: 0.5em = 8px
        container padding: 15px top + 15px bottom = 30px
@@ -188,5 +261,45 @@ button:active {
        Add buffer: ~320px */
     height: calc(100vh - 330px);
     min-height: 200px;
+  }
+  .content-wrapper {
+    flex-direction: column;
+  }
+
+  /* Modal preview for mobile */
+  .preview-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    flex-direction: column;
+    z-index: 1000;
+  }
+  .preview-modal .preview-header {
+    background: white;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+  }
+  .preview-modal .preview-content {
+    flex: 1;
+    background: white;
+    padding: 10px;
+    overflow: auto;
+  }
+  .preview-modal .preview-content img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+  }
+  .preview-modal .preview-placeholder {
+    text-align: center;
+    color: #666;
+  }
+  .preview-modal .file-icon {
+    font-size: 3em;
+    margin-bottom: 10px;
   }
 }
