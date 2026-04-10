@@ -5,6 +5,8 @@ body {
   margin: 0;
   padding: 1em; 
   background-color: #f4f4f4; 
+  /* Prevent accidental horizontal scroll on small screens */
+  overflow-x: hidden;
 }
 .container { 
   max-width: 1200px; 
@@ -75,6 +77,8 @@ h2 {
   align-items: center;
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
   gap: 10px;
+  /* Allow children to shrink and wrap without forcing horizontal overflow */
+  min-width: 0;
 }
 .file-info { 
   flex-grow: 1; 
@@ -83,8 +87,11 @@ h2 {
 .file-name { 
   font-weight: 500; 
   margin-bottom: 4px;
-  word-wrap: break-word;
-  overflow-wrap: break-word;
+  /* Robust wrapping for very long, space-less filenames */
+  max-width: 100%;
+  overflow-wrap: anywhere; /* modern, breaks even unbroken strings when needed */
+  word-break: break-word;  /* fallback behavior */
+  hyphens: auto;
 }
 .file-date { 
   font-size: 0.85em; 
@@ -213,6 +220,13 @@ button:disabled:hover {
 .preview-placeholder {
   text-align: center;
   color: #666;
+}
+.preview-placeholder p {
+  /* Prevent long filenames in the preview placeholder from causing overflow */
+  margin: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 .preview-placeholder .file-icon {
   font-size: 3em;
